@@ -54,9 +54,22 @@ class TransactionController extends Controller
     public function process()
     {
         $unprocessedTransactions = [];
+        //$connection = DB::connection("mongodb");
+        //dd($connection);
+        // DB::beginTransaction();
+        // try {
 
-        $session = DB::getMongoClient()->startSession();
-        $session->startTransaction();
+        //     $customer = new Customer();
+        //     $customer->customer_name = "Test Customer";
+        //     $customer->nic = "123123123";
+        //     $customer->save();
+
+        //     DB::commit();
+        // } catch (Exception $ex) {
+        //     DB::rollBack();
+        //     return $ex;
+        // } 
+
         try {
             $unprocessedTransactions = DB::collection('transactions')
             ->where("is_proccessed", 0)
@@ -92,7 +105,7 @@ class TransactionController extends Controller
 
                 foreach($accumulations as $k => $acc){
                     $customer = Customer::where("_id", $k)->first();
-                    $customer->point_balancefff = $customer->point_balance + $accumulations[$k];
+                    $customer->point_balance = $customer->point_balance + $accumulations[$k];
                     $customer->save();
                 }
 
@@ -107,7 +120,7 @@ class TransactionController extends Controller
                 "message" => "No transactions to process"
             ]);
         } catch (Exception $ex) {
-            $session->abortTransaction();
+           //$session->abortTransaction();
             return $ex;
         }
     }
